@@ -82,3 +82,55 @@ export async function eliminarFactura(id: string): Promise<void> {
   const facturasFiltradas = facturas.filter(f => f.id !== id);
   await guardarFacturas(facturasFiltradas);
 }
+
+// Actualizar crédito disponible
+export async function actualizarCredito(credito: number): Promise<void> {
+  const response = await fetch(`${API_URL}/credito`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${publicAnonKey}`,
+    },
+    body: JSON.stringify({ credito }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Error al actualizar crédito: ${error}`);
+  }
+}
+
+// Obtener ambos créditos
+export async function obtenerCreditos(): Promise<{ credito1: number; credito2: number }> {
+  const response = await fetch(`${API_URL}/creditos`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${publicAnonKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Error al obtener créditos: ${error}`);
+  }
+
+  const data = await response.json();
+  return { credito1: data.credito1 || 0, credito2: data.credito2 || 0 };
+}
+
+// Actualizar un crédito específico (1 o 2)
+export async function actualizarCreditoEspecifico(numero: 1 | 2, credito: number): Promise<void> {
+  const response = await fetch(`${API_URL}/creditos/${numero}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${publicAnonKey}`,
+    },
+    body: JSON.stringify({ credito }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Error al actualizar crédito ${numero}: ${error}`);
+  }
+}
